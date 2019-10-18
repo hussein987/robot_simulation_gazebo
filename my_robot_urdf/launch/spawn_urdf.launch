@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <param name="robot_description" command="cat '$(find my_robot_urdf)/urdf/my_robot.urdf'" />
+    
+    <node name="mybot_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
+          args="-urdf -param robot_description -model my_robot" />
+
+
+<!-- loads the controllers -->
+<rosparam file="$(find my_robot_urdf)/config/config.yaml" command="load" />
+<node name="controller_spawner" pkg="controller_manager" type="spawner" ns="/simple_model" args="base_to_second_joint_position_controller second_to_third_joint_position_controller joint_state_controller --shutdown-timeout 3"/> 
+<!-- converts joint states to TF transforms -->
+<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
+    <remap from="/joint_states" to="/simple_model/joint_states" />
+</node>          
+
+
+</launch>
